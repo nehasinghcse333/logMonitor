@@ -1,0 +1,87 @@
+import React from 'react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import LogMonitor from './LogMonitor';
+
+// Basic unit tests for LogMonitor component.
+// These tests use @testing-library/react and assume your project has jest & testing-library configured (create-react-app does by default).
+
+const sampleLogsMixed = `
+12:00:00 46578 START Job A processing
+12:04:00 46578 END Job A done
+12:10:00 12345 START Job B processing
+12:22:00 12345 END Job B done
+12:30:00 67890 START Job C processing
+12:36:30 67890 END Job C done
+`;
+
+const sampleCSV = `time,pid,status,description
+12:00:00,11111,START,CSV Job 1
+12:07:10,11111,END,CSV Job 1 finished
+`;
+
+test('parses pasted logs and shows OK/WARNING/ERROR statuses', async () => {
+  render(<LogMonitor />);
+
+  // paste logs
+  const textarea = screen.getByPlaceholderText(/Paste logs here/i);
+  userEvent.clear(textarea);
+  userEvent.type(textarea, sampleLogsMixed);
+
+  // click Process
+  const processBtn = screen.getByRole('button', { name: /Process/i });
+  userEvent.click(processBtn);
+
+  // Wait for rows to render
+  await waitFor(() => expect(screen.getByText('46578')).toBeInTheDocument());
+
+  // Job A: 4m -> OK
+  expect(screen.getAllByText('OK').length).toBeGreaterThanOrEqual(1);
+  // Job B: 12m -> ERROR (12 minutes > 10 min)
+  expect(screen.getByText('ERROR')).toBeInTheDocument();
+  // Job C: 6m30s -> WARNING (>5m)
+  expect(screen.getByText('WARNING')).toBeInTheDocument();
+
+  // check that PIDs appear in table
+  expect(screen.getByText('46578')).toBeInTheDocument();
+  expect(screen.getByText('12345')).toBeInTheDocument();
+  expect(screen.getByText('67890')).toBeInTheDocument();
+
+  // check summary counts are present
+  expect(screen.getByText(/Total:/i)).toBeInTheDocument();
+  expect(screen.getByText(/Warnings:/i)).toBeInTheDocument();
+  expect(screen.getByText(/Errors:/i)).toBeInTheDocument();
+});
+
+test('handles orphan END and incomplete START entries', async () => {
+  render(<LogMonitor />);
+
+  const textarea = screen.getByPlaceholderText(/Paste logs here/i);
+  userEvent.clear(textarea);
+
+  const text = `
+12:00:00 20000 START OrphanStart
+12:05:00 30000 END OrphanEnd
+`;
+  userEvent.type(textarea, text);
+  userEvent.click(screen.getByRole('button', { name: /Process/i }));
+
+  await waitFor(() => expect(screen.getByText(/Orphan END entries:/i)).toBeInTheDocument());
+  expect(screen.getByText(/Incomplete START entries:/i)).toBeInTheDocument();
+
+  // ensure the orphan PID and incomplete PID are visible in the lists
+  expect(screen.getByText(/PID 30000/i)).toBeInTheDocument();
+  expect(screen.getByText(/PID 20000/i)).toBeInTheDocument();
+});
+
+test('parses CSV with header correctly', async () => {
+  render(<LogMonitor />);
+  const textarea = screen.getByPlaceholderText(/Paste logs here/i);
+  userEvent.clear(textarea);
+  userEvent.type(textarea, sampleCSV);
+  userEvent.click(screen.getByRole('button', { name: /Process/i }));
+
+  await waitFor(() => expect(screen.getByText('11111')).toBeInTheDocument());
+  // duration 7m10s -> WARNING (>5m)
+  expect(screen.getByText('WARNING')).toBeInTheDocument();
+});
