@@ -1,0 +1,146 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+
+/* top-level container */
+.lm-root {
+  max-width: 980px;
+  margin: 24px auto;
+  font-family: Inter, system-ui, -apple-system, Roboto, "Segoe UI", sans-serif;
+  color: var(--lm-foreground);
+  padding: 8px;
+}
+
+/* card */
+.lm-card {
+  background: var(--lm-bg);
+  padding: 16px;
+  border-radius: var(--lm-radius);
+  box-shadow: var(--lm-card-shadow);
+}
+
+/* action controls */
+.lm-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.lm-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+.lm-btn.secondary {
+  background: #6b7280;
+}
+.lm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lm-input-file {
+  display: inline-block;
+}
+
+/* textarea */
+.lm-textarea {
+  width: 100%;
+  min-height: 180px;
+  font-family: monospace;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  box-sizing: border-box;
+}
+
+/* summary / stats */
+.lm-stats {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.lm-stat {
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+/* table */
+.lm-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: auto;
+}
+.lm-table thead {
+  background: #f1f5f9;
+}
+.lm-table th,
+.lm-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #eef2f7;
+}
+.lm-table tbody tr:hover {
+  background: #fbfdff;
+}
+.lm-table td.desc {
+  max-width: 420px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* status pill */
+.lm-pill {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+.lm-pill.ok {
+  background: var(--ok-bg);
+  color: var(--ok-color);
+}
+.lm-pill.warn {
+  background: var(--warn-bg);
+  color: var(--warn-color);
+}
+.lm-pill.err {
+  background: var(--err-bg);
+  color: var(--err-color);
+}
+
+/* notes for orphans / incompletes */
+.lm-note {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 6px;
+}
+.lm-note.warn {
+  background: var(--warn-bg);
+  color: var(--warn-color);
+}
+.lm-note.err {
+  background: var(--err-bg);
+  color: var(--err-color);
+}
+.lm-note.info {
+  background: #eef2ff;
+  color: #0f172a;
+}
+
+/* small helper */
+.lm-muted {
+  color: var(--lm-muted);
+  font-size: 13px;
+}
